@@ -1164,7 +1164,9 @@ class MqttClient implements ClientContract
         $this->logger->debug('Waiting for {bytes} bytes of data.', ['bytes' => $remaining]);
 
         while (feof($this->socket) === false && $remaining > 0) {
+            socket_set_blocking($this->socket, true);
             $receivedData = fread($this->socket, $remaining);
+            socket_set_blocking($this->socket, false);
             if ($receivedData === false) {
                 $this->logger->error('Reading data from the socket of the broker failed.');
                 throw new DataTransferException(
